@@ -1,32 +1,3 @@
-setwd("~/Dropbox/Research/Trait work/Trait niches/Final R scripts") #!!!!Change filepaths for GitHub
-
-##################################
-## Function to quantify phylogenetic signals and produce phylogenetic correlograms
-## Assumes that each taxon in the trait data may correspond zero, one or multiple tips in the phylogenetic tree
-
-## Arguments:
-## Trait data (standardised if fuzzy - see Chevenet et al. 1994) with taxa as rows and trait modalities as columns. The first column should contain the short name for each taxon. Trait category and modality names should be separated by a period in the column names, i.e. "category.modality"
-traits <- read.csv("traits.standardised.csv", row.names=1)
-
-## Phylogenetic tree in NEXUS format
-phylo.tree <- read.nexus("trait.niches.mrbayes.nex.con.tre")
-
-## Data frame relating tip labels to unique species short name in the trait database (NB: As a minumum this should include columns named "short.name" and "tip.label", which rows corresponding to all tip labels in the phylogenetic tree)
-label.info <- read.csv("tip_label_names.csv")
-
-## Number of replicate samples to take from the full phylogenetic tree. Suggest nreps>=100 for trait data which includes taxa assigned at a coarse taxonomic resolution (e.g. order)
-nreps <- 4
-
-## (optional) Return plots of p values and correlograms. Defaults to TRUE. If TRUE, function outputs two pdfs to the working directory: ("Phylosignal p values.pdf") a boxplot of pvalues per trait category; ("Phylosignal correlations.pdf") correlograms of cumulative phylogenetic correlations per trait category
-plots <- T
-
-## (optional) Number of cores for computing phylogenetic signal. Defaults to 1
-cores <- 4
-
-## Value:
-## A list containing two data frames: (1) sample means, standard deviations, minima and maxima of p values for each trait category from phyloSignal function (phylosignal package); (2) means and 95% confidence intervals of phylogenetic signals at 100 regular intervals of phylogenetic distance, as well as the null correlation (Moran's I)
-##################################
-
 phylo_constraints <- function(traits, phylo.tree, label.info, nreps, plots, cores){
   library(ape)
   library(phylosignal)

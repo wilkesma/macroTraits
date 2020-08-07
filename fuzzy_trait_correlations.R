@@ -1,16 +1,3 @@
-setwd("~/Dropbox/Research/Trait work/Trait niches/Final R scripts") #!!!!Change file paths for GitHub
-
-##################################
-## Function to produce null correlation matrix for fuzzy traits given the trait categories and fuzzy scoring rules used
-
-## Arguments:
-## Fuzzy trait data (NB: trait category and modality names should be separated by a period in the column names e.g. category.modality)
-data.full <- read.csv("traits.csv", row.names=1) #short.name column as row names
-
-#The number of times to resample to fuzzy trait matrix. Should be >>nrow(x) and preferably a very large number, e.g. 1 million)
-n.samples <- 100000
-##################################
-
 fuzzy_trait_correlations <- function(x){
   library(plyr)
   

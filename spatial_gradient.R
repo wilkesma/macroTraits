@@ -1,38 +1,3 @@
-setwd("~/Dropbox/Research/Trait work/Trait niches/Final R scripts") #!!!!Change filepaths for GitHub
-
-##################################
-## Function to sample spatial gradients in taxonomic and trait structure using gradient forests
-
-##Arguments:
-load("trait.niches.spatial.gf.data.v7.2.RData")
-
-## Names for the taxa to be included in the analysis. These names must match filenames (without file extension) of the SDM rasters contained in file.path
-taxa.names <- names(genera.mods)[1:3]
-
-## Trait data (standardised if fuzzy - see Chevenet et al. 1994) with taxa as rows and trait modalities as columns. The first column should contain the name for each taxon, which should match exactly the names in taxa.names. Trait category and modality names should be separated by a period in the column names, i.e. "category.modality"
-traits <- read.csv("traits.standardised.csv", row.names=1)[1:3,]
-row.names(traits) <- taxa.names
-
-## Altitude (raster) with the same resolution, extent and origin of SDM rasters for each taxon
-alt <- euro.env$altitude
-rm(euro.env)
-
-## File path to SDM rasters for each taxon. Must all be of the same resolution, extent and origin of alt
-file.path <- "~/Dropbox/Research/Trait work/Trait niches/v7/SDM rasters v3/"
-
-## Number of grid cells to select per sample. Suggest n>=1000 e.g. at 100 m resolution and continental extent
-n=10
-
-## Number of times to sample n grid cells. Suggest k>=1000
-k=10
-
-## (Optional) number of cores to use for parallel processing. Defaults to 1
-ncores=2
-
-## Value:
-## A list of six dataframes, each providing mean and standard deviations for the turnover functions along eastings, northings and altitude for both taxonomic structure and trait structure, the overall goodness-of-fit for taxonomic and trait models, and the goodness-of-fit per taxon and per trait
-##################################
-
 spatial_gradient <- function(taxa.names, traits, alt, file.path, n, k, ncores){
   library(raster)
   library(doParallel)
