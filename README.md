@@ -11,10 +11,11 @@ fuzzy_trait_correlations(x, n.samples)
 
 Arguments:<br/>
 x         A data frame containing fuzzy traits (numeric). Trait category and modality names should be separated by a period in the column names e.g. category.modality. Taxon names as row names<br/>
-n.samples The number of times to resample to fuzzy trait matrix (integer). Should be >>nrow(x) and preferably a very large number, e.g. 1 million)
+n.samples The number of times to resample to fuzzy trait matrix (integer). Should be >>nrow(x) and preferably a very large number, e.g. 1 million)<br/>
+n.cors    The number of times to draw a sample of nrow(x) resampled trait distributions for calculating pairwise trait correlations
 
 Value:
-A null correlation matrix for comparison with observed pairwise trait correlations
+A list of null correlation matrices with length equal to n.cors for comparison with observed pairwise trait correlations
 
 # phylo_constraints
 
