@@ -1,16 +1,16 @@
-fuzzy_trait_correlations <- function(x){
+fuzzy_trait_correlations <- function(tr, n.samples, n.cors){
   library(plyr)
   
   ## Extract category names
   get.categories <- function(x) { sub("(.*?)[\\.|:].*", "\\1", colnames(x)) } #Functions to extract category names on the fly
-  categories <- unique(get.categories(x)) #Category names
+  categories <- unique(get.categories(tr)) #Category names
   
   ## Fuzzy trait scoring system
   fuzzy.row.max <- vector()
   fuzzy.row.min <- vector()
   fuzzy.max <- vector()
   for(i in 1:length(categories)){
-    y <- x[, which(get.categories(x) %in% categories[i])]
+    y <- tr[, which(get.categories(tr) %in% categories[i])]
     fuzzy.row.max[i] <- max(rowSums(y))
     fuzzy.row.min[i] <- min(rowSums(y))
     fuzzy.max[i] <- max(y)
@@ -35,7 +35,7 @@ fuzzy_trait_correlations <- function(x){
     } #Function to resample trait distributions within trait categories
     resampled.traits <- list()
     for(i in 1:length(trait.categories)){
-      y <- (trait.data[1, ])[,which(get.categories(x) %in% trait.categories[i])]
+      y <- (trait.data[1, ])[,which(get.categories(tr) %in% trait.categories[i])]
       resampled.traits[[i]] <- gen.traits(y, trait.maxs[i], trait.row.mins[i], trait.row.maxs[i])
     }
     resampled.traits <- do.call(cbind, resampled.traits)
@@ -43,36 +43,29 @@ fuzzy_trait_correlations <- function(x){
     resampled.traits
   } #Function to resample trait distributions across all trait categories
   
-  resampled.traits <- resample.traits(trait.data=x, trait.categories=categories, n=n.samples, trait.maxs=fuzzy.max, trait.row.mins=fuzzy.row.min, trait.row.maxs=fuzzy.row.max) #Matrix of n hypothetical species (rows) and their hypothethical traits (columns) given the fuzzy scoring system used
+  resampled.traits <- resample.traits(trait.data=tr, trait.categories=categories, n=n.samples, trait.maxs=fuzzy.max, trait.row.mins=fuzzy.row.min, trait.row.maxs=fuzzy.row.max) #Matrix of n hypothetical species (rows) and their hypothethical traits (columns) given the fuzzy scoring system used
   
   ## Unique trait combinations in resampled trait matrix
   max.utcs <- vector()
   for(i in 1:length(categories)){
-    max.utcs[i] <- nrow(count(resampled.traits[, which(get.categories(x) %in% categories[i])]))
-  }
-  max.utcs #Number of theoretical combinations by trait category
+    max.utcs[i] <- nrow(count(resampled.traits[, which(get.categories(tr) %in% categories[i])]))
+  } #Number of theoretical combinations by trait category
   names(max.utcs) <- categories
   utcs.theoretical <- prod(max.utcs) #Number of theoretical combinations as product of individual category combinations
   
   ## Observed unique trait profiles
-  singular.taxa <- nrow(unique(x))
+  singular.taxa <- nrow(unique(tr))
   
   ## Null correlations
   get.cor <- function(x){
-    sampleii <- x[c(sample(1:nrow(x), nrow(x), replace=F)),]
-    samplei <- as.data.frame(scale(sampleii, center=T, scale=F))
-    cors <- array(dim=c(ncol(samplei), ncol(samplei)))
-    for(i in 1:ncol(samplei)){
-      for(j in 1:ncol(samplei)){
-        yi <- cor.test(samplei[,i], samplei[,j], method="spearman", alternative="two.sided")
-        y <- yi$estimate
-        cors[i,j] <- y
-      }
-    }
-    colnames(cors) <- colnames(x)
-    rownames(cors) <- colnames(x)
-    cors
-  } #Function samples ntaxa (number of taxa in trait database) from resampled trait distributions, calculates correlation coefficient and then removes the perfect correlations (between the same trait)
+    samplei <- x[c(sample(1:nrow(tr), nrow(tr), replace=F)),]
+    samplei <- as.data.frame(scale(samplei, center=T, scale=F))
+    cor(samplei, method="spearman")
+  } #Function samples ntaxa (number of taxa in trait database) from resampled trait distributions and gives pairwise trait correlation matrix
   
-  get.cor(resampled.traits) #Null correlation matrix for comparison with observed correlation matrix
+  cors.samples <- list()
+  for(i in 1:n.cors){
+    cors.samples[[i]] <- get.cor(resampled.traits)
+  } #Null correlation matrix for comparison with observed correlation matrix
+  cors.samples
 }
